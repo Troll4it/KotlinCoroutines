@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Button
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
+import kotlin.system.measureTimeMillis
 
 class CoroutineActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,16 +16,10 @@ class CoroutineActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btn2).setOnClickListener { test2() }
         findViewById<Button>(R.id.btn3).setOnClickListener { test3() }
         findViewById<Button>(R.id.btn4).setOnClickListener { test4() }
-        findViewById<Button>(R.id.btn5).setOnClickListener { test5() }
     }
 
 
     private fun test1() {
-
-        /**
-         *
-         */
-
         GlobalScope.launch {
             println("GlobalScope111111111")
         }
@@ -37,7 +31,6 @@ class CoroutineActivity : AppCompatActivity() {
 
         val job = GlobalScope.launch {
             println("GlobalScope2222222222")
-
         }
         job.cancel()
 //        job.start()
@@ -50,7 +43,6 @@ class CoroutineActivity : AppCompatActivity() {
      * 挂起函数  （关键字  suspendd）
      */
     private fun test3() {
-
         /**
          * runBlocking 为最高级协程
          */
@@ -69,37 +61,38 @@ class CoroutineActivity : AppCompatActivity() {
 
     }
 
+    /**
+     * async 异步， await 等待  同步出现
+     */
     private fun test4() {
-        /**
-         * 协程运行是有序的吗？  多个协程怎么添加进去
-         */
         runBlocking {
-            GlobalScope.launch {
-                println("GlobalScope44444444")
+            var time = measureTimeMillis {
+                println("同步 ${doTest4One() + doTest4Two()}")
             }
-            println("Hello")
-            runBlocking {
-                println("child  GlobalScope")
+            println("同步运行的时间 $time ms")
+
+            time = measureTimeMillis {
+                val asyncOne = async {
+                    doTest4One()
+                }
+                val asyncTwo = async {
+                    doTest4Two()
+                }
+                println("异步 ${asyncOne.await() + asyncTwo.await()}")
             }
-        }
-
-
-    }
-
-    private fun test5() {
-
-        runBlocking {
-            val channel = Channel<String>()
-            launch {
-                channel.send("GlobalScope555555555")
-            }
-
-            GlobalScope.launch {
-                println("receive ${channel.receive()}")
-            }
+            println("异步运行的时间 $time ms")
         }
 
     }
 
+    private suspend fun doTest4One(): Int {
+        delay(1000L)
+        return 1
+    }
+
+    private suspend fun doTest4Two(): Int {
+        delay(1000L)
+        return 2
+    }
 
 }
