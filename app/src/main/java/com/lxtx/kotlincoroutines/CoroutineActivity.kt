@@ -3,7 +3,10 @@ package com.lxtx.kotlincoroutines
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Button
+import kotlinx.android.synthetic.main.activity_coroutinescope.*
 import kotlinx.coroutines.*
+import okhttp3.*
+import java.io.IOException
 import kotlin.system.measureTimeMillis
 
 class CoroutineActivity : AppCompatActivity() {
@@ -16,6 +19,10 @@ class CoroutineActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btn2).setOnClickListener { test2() }
         findViewById<Button>(R.id.btn3).setOnClickListener { test3() }
         findViewById<Button>(R.id.btn4).setOnClickListener { test4() }
+        btn5.setOnClickListener {
+            okhttp()
+        }
+        btn6.setOnClickListener { coroutineOkhttp() }
     }
 
 
@@ -82,6 +89,7 @@ class CoroutineActivity : AppCompatActivity() {
             }
             println("异步运行的时间 $time ms")
         }
+//            withContext(Dispatchers.Default) { }
 
     }
 
@@ -93,6 +101,37 @@ class CoroutineActivity : AppCompatActivity() {
     private suspend fun doTest4Two(): Int {
         delay(1000L)
         return 2
+    }
+
+
+    private fun okhttp() {
+        OkHttpClient().newCall(
+            Request.Builder().url("http://www.wanandroid.com")
+                .get().build()
+        ).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                println("Okhttp::: ${response.body().toString()}")
+            }
+
+        })
+    }
+
+    private fun coroutineOkhttp() {
+        runBlocking {
+            val s = async(Dispatchers.IO) {
+                OkHttpClient().newCall(
+                    Request.Builder().url("http://www.wanandroid.com")
+                        .get().build()
+                ).execute().body().toString()
+            }.await()
+            println("协程发起的网络请求 $s")
+
+
+        }
     }
 
 }
