@@ -122,12 +122,11 @@ class CoroutineActivity : AppCompatActivity() {
 
     private fun coroutineOkhttp() {
         runBlocking {
-            val s = async(Dispatchers.IO) {
-                OkHttpClient().newCall(
-                    Request.Builder().url("http://www.wanandroid.com")
-                        .get().build()
-                ).execute().body().toString()
-            }.await()
+            val s = withContext(Dispatchers.IO) {
+                OkHttpClient()
+                    .newCall(Request.Builder().url("http://www.wanandroid.com").get().build())
+                    .execute().body().toString()
+            }
             println("协程发起的网络请求 $s")
 
 

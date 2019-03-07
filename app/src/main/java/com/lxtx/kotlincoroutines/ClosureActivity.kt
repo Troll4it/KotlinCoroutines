@@ -14,7 +14,6 @@ class ClosureActivity : AppCompatActivity() {
          * https://www.cnblogs.com/ssp2110/p/3797666.html
          *
          *闭包：函数的运行环境
-         * 持有函数的运行环境
          * 函数内部可以定义函数，也可以定义类
          *.在函数中返回一个函数，被返回的函数可以调用主函数的属性
          * 自由变量   引用环境
